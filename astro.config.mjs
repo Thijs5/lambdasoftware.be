@@ -3,9 +3,10 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 // ── Deployment target ────────────────────────────────────────────────────────
-// KonsoleH-managed webspace at the domain root, served over SFTP by
-// .github/workflows/deploy.yml. No `base` needed since the site is not under
-// a subpath.
+// Dual-deployed by .github/workflows/deploy.yml during the move off KonsoleH:
+// SFTP to the KonsoleH webspace, and GitHub Pages (see public/CNAME and
+// docs/adr/0004-migrate-hosting-to-github-pages.md). Domain root either way,
+// so no `base` needed.
 // ────────────────────────────────────────────────────────────────────────────
 export default defineConfig({
   site: 'https://lambdasoftware.be',

@@ -1,8 +1,17 @@
-name: Deploy to KonsoleH (lambdasoftware.be)
+name: Deploy to KonsoleH + GitHub Pages (lambdasoftware.be)
 
 # One-time setup: repo Settings -> Secrets and variables -> Actions.
 #   Secrets:   SFTP_USERNAME, SFTP_PASSWORD
 #   Variables: SFTP_HOST, SFTP_PORT, SFTP_REMOTE_PATH
+#
+# GitHub Pages also needs: repo Settings -> Pages -> Build and deployment ->
+# Source: "GitHub Actions" (one-time, one click).
+#
+# TEMPORARY dual-deploy during the move off KonsoleH: this pushes to both
+# targets so DNS can be cut over to Pages with no downtime window. Once
+# lambdasoftware.be's DNS points at GitHub Pages and HTTPS is confirmed
+# working there, delete the SFTP step and the KonsoleH secrets/variables.
+# See docs/adr/0004-migrate-hosting-to-github-pages.md.
 
 on:
   push:
@@ -13,6 +22,11 @@ on:
 concurrency:
   group: deploy
   cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   e2e:
@@ -77,3 +91,19 @@ jobs:
           local_path: './dist/*'
           remote_path: ${{ vars.SFTP_REMOTE_PATH }}
           sftp_only: true
+
+      - name: Upload dist/ as the Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy-pages:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

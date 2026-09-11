@@ -52,22 +52,41 @@ before deploy, so a broken build or a visual regression blocks the release. See 
 pinned Playwright version note in `.github/workflows/deploy.yml` before bumping
 `@playwright/test`.
 
-## Deploy (KonsoleH, lambdasoftware.be)
+## Deploy (KonsoleH + GitHub Pages, lambdasoftware.be)
+
+**Temporary dual-deploy** — see
+`docs/adr/0004-migrate-hosting-to-github-pages.md`: KonsoleH has no working
+HTTPS for this domain (no SSL certificate installed), so the site is moving
+to GitHub Pages, which issues one automatically. Once DNS is repointed at
+Pages and HTTPS is confirmed working there, the SFTP step and its
+secrets/variables below get removed and this section gets rewritten for
+Pages only.
 
 Every push to `main` runs `.github/workflows/deploy.yml`: it runs the e2e suite,
-type-checks and builds the site with Astro, then pushes the contents of `dist/` to
-the KonsoleH webspace over SFTP. Plain static files, no runtime needed on the server.
+type-checks and builds the site with Astro, then:
 
-One-time setup, repo **Settings → Secrets and variables → Actions**:
+- pushes the contents of `dist/` to the KonsoleH webspace over SFTP, and
+- publishes the same `dist/` to GitHub Pages.
 
-**Secrets** tab:
+Plain static files, no runtime needed on either target. The custom domain for
+Pages comes from `public/CNAME`, copied into `dist/` by the build.
+
+One-time setup:
+
+**Repo Settings → Pages → Build and deployment → Source: "GitHub Actions"**
+(this repo must be public — GitHub Pages' free tier requires it for a
+public custom domain).
+
+**Repo Settings → Secrets and variables → Actions**:
+
+Secrets tab:
 
 | Secret          | Value              |
 | --------------- | ------------------ |
 | `SFTP_USERNAME` | FTP/SFTP username  |
 | `SFTP_PASSWORD` | FTP/SFTP password  |
 
-**Variables** tab:
+Variables tab:
 
 | Variable           | Value                                                     |
 | ------------------ | ---------------------------------------------------------- |
