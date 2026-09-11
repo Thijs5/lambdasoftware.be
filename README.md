@@ -3,7 +3,7 @@
 ![Deploy](https://github.com/Thijs5/lambdasoftware.be/actions/workflows/deploy.yml/badge.svg)
 ![Astro](https://img.shields.io/badge/astro-7-BC52EE?logo=astro&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-5-3178C6?logo=typescript&logoColor=white)
-![Node](https://img.shields.io/badge/node-20-339933?logo=nodedotjs&logoColor=white)
+![Node](https://img.shields.io/badge/node-24-339933?logo=nodedotjs&logoColor=white)
 ![Tested with Playwright](https://img.shields.io/badge/tested%20with-playwright-2EAD33?logo=playwright&logoColor=white)
 ![Zero client JS](https://img.shields.io/badge/client--side%20JS-0KB-blue)
 
@@ -14,7 +14,7 @@ loads as one document with one request.
 ## Develop
 
 ```bash
-nvm use          # Node 20
+nvm use          # Node 24
 npm install
 npm run dev       # http://localhost:4321
 ```
