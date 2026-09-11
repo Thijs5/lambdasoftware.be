@@ -7,14 +7,18 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "test:e2e": "playwright test",
+    "test:e2e:update": "playwright test --update-snapshots"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^5.0.0"
+    "astro": "^7.3.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.63.0",
+    "sirv-cli": "^3.0.1",
     "typescript": "^5.9.3"
   }
 }

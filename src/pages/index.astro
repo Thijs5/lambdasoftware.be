@@ -66,7 +66,8 @@ const stackText = site.stack.rows
           <div class="term-chrome" aria-hidden="true"><span></span><span></span><span class="dot-accent"></span></div>
           <pre class="term-body" aria-hidden="true" id="term-body"><span class="c-punct">$</span> <span id="term-typed">lambda --stack
 
-{stackText}</span></pre>
+{stackText}</span>
+<span class="c-punct" id="term-prompt-2">$ </span></pre>
         </div>
       </div>
     </section>
@@ -327,43 +328,62 @@ const stackText = site.stack.rows
   // Skipped entirely for prefers-reduced-motion — the static text just shows.
   const typed = document.getElementById('term-typed');
   const term = document.getElementById('term-body');
+  const prompt2 = document.getElementById('term-prompt-2');
 
-  if (typed && term && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (typed && term && prompt2 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const command = 'lambda --stack';
     const full = typed.textContent ?? '';
     const output = full.slice(command.length);
 
-    typed.textContent = '';
-    const cursor = document.createElement('span');
-    cursor.className = 'term-cursor';
-    typed.after(cursor);
+    const setup = () => {
+      // The trailing "$" prompt is already in the markup, so at this point
+      // (before anything is touched) the terminal is already at its final
+      // height. Lock that in, then hide the prompt until typing reaches it —
+      // the terminal never resizes during the animation.
+      //
+      // Measured only after document.fonts.ready: JetBrains Mono loads via
+      // font-display: swap, so an earlier measurement would lock in the
+      // fallback font's (shorter) metrics and the box would still grow once
+      // the real font swaps in.
+      term.style.minHeight = `${term.getBoundingClientRect().height}px`;
+      prompt2.style.visibility = 'hidden';
 
-    let i = 0;
-    const typeCommand = () => {
-      if (i < command.length) {
-        typed.textContent += command[i];
-        i++;
-        setTimeout(typeCommand, 40);
-      } else {
-        setTimeout(() => {
-          typed.textContent += output + '\n';
-          const prompt = document.createElement('span');
-          prompt.className = 'c-punct';
-          prompt.textContent = '$';
-          cursor.before(prompt, ' ');
-        }, 300);
-      }
+      typed.textContent = '';
+      const cursor = document.createElement('span');
+      cursor.className = 'term-cursor';
+      typed.after(cursor);
+
+      let i = 0;
+      const typeCommand = () => {
+        if (i < command.length) {
+          typed.textContent += command[i];
+          i++;
+          setTimeout(typeCommand, 40);
+        } else {
+          setTimeout(() => {
+            typed.textContent += output;
+            prompt2.style.visibility = 'visible';
+            prompt2.after(cursor);
+          }, 300);
+        }
+      };
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            typeCommand();
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.35 }
+      );
+      observer.observe(term);
     };
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          typeCommand();
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.35 }
-    );
-    observer.observe(term);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(setup);
+    } else {
+      setup();
+    }
   }
 </script>

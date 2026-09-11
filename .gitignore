@@ -7,3 +7,10 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+
+# Playwright run artifacts — the baseline snapshots in e2e/**/*-snapshots/
+# ARE committed, only these transient outputs are ignored.
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
