@@ -1,0 +1,108 @@
+---
+/**
+ * lambda_software mark — canonical Revision 2 from the Lambda Software Design
+ * System (assets/logo-mark.svg): two crossed strips of equal
+ * weight on a shared baseline. The right strip runs full height and carries
+ * the apex; the left stops flush along the right strip's edge and passes
+ * underneath, reading via a soft cast shadow at the junction.
+ *
+ * Default is single ink colour via currentColor (variant="onDark" for ink
+ * backgrounds). `accent` switches to the sanctioned two-tone purple lockup
+ * (assets/logo-mark-accent.svg / -ondark.svg, guidelines/logo-accent.card.html)
+ * — reserved for marketing-site brand chrome (header/footer), not the mark's
+ * general default.
+ */
+interface Props {
+  size?: number;
+  wordmark?: boolean;
+  variant?: 'default' | 'onDark';
+  accent?: boolean;
+  class?: string;
+}
+const {
+  size = 28,
+  wordmark = false,
+  variant = 'default',
+  accent = false,
+  class: className,
+} = Astro.props;
+
+// Mark viewBox is 99.86 x 100 — near-square, unlike the old 100 x 77.07 mark.
+// Baseline-aligned next to the wordmark, the icon's full height otherwise
+// towers over the text's cap-height — render it a bit smaller than `size`
+// in that lockup so it reads at the same visual scale as the text.
+const markScale = wordmark ? 0.78 : 1;
+const markSize = +(size * markScale).toFixed(2);
+const height = +(markSize * (100 / 99.86)).toFixed(2);
+const uid = Math.random().toString(36).slice(2, 8);
+
+// Wordmark stays ink/white regardless of `accent` — only the mark gets colour.
+const inkColor = variant === 'onDark' ? '#ffffff' : 'var(--ink)';
+
+// Path colours: single currentColor ink by default, fixed two-tone purple
+// when accent is set (guidelines/logo-accent.card.html).
+const pathLeftFill = accent ? (variant === 'onDark' ? '#7C3AED' : '#8B5CF6') : 'currentColor';
+const pathRightFill = accent ? (variant === 'onDark' ? '#A78BFA' : '#6D28D9') : 'currentColor';
+const shadowColor = variant === 'onDark' ? '#0A0A0A' : accent ? '#2E1065' : '#000000';
+const shadowOpacity = variant === 'onDark' ? '0.55' : accent ? '0.5' : '0.6';
+
+// Wordmark scales with the mark: DS reference pairs a 26px mark with 21px
+// text (ratio ~0.808) — keep that ratio at any size instead of a fixed rem.
+const wordmarkSize = +(size * (21 / 26)).toFixed(2);
+---
+
+<span class={`logo${className ? ` ${className}` : ''}`} style={`font-size: ${size}px; color: ${inkColor}`}>
+  <svg
+    class="logo__mark"
+    width={markSize}
+    height={height}
+    viewBox="0 0 99.86 100"
+    fill-rule="evenodd"
+    role="img"
+    aria-label={wordmark ? 'lambda_software' : 'lambda_software logo'}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <linearGradient
+        id={`lg-${uid}`}
+        gradientUnits="userSpaceOnUse"
+        x1="55.93"
+        y1="60"
+        x2="43.57"
+        y2="66.57"
+      >
+        <stop offset="0" stop-color={shadowColor} stop-opacity={shadowOpacity}></stop>
+        <stop offset="1" stop-color={shadowColor} stop-opacity="0"></stop>
+      </linearGradient>
+      <clipPath id={`lc-${uid}`}>
+        <path d="M36.07 22.65L48.41 45.85L23.16 100L0 100Z"></path>
+      </clipPath>
+    </defs>
+    <g>
+      <path d="M36.07 22.65L48.41 45.85L23.16 100L0 100Z" fill={pathLeftFill}></path>
+      <g clip-path={`url(#lc-${uid})`}>
+        <rect x="-20" y="-20" width="160" height="160" fill={`url(#lg-${uid})`}></rect>
+      </g>
+      <path d="M24.03 0L46.69 0L99.86 100L77.2 100Z" fill={pathRightFill}></path>
+    </g>
+  </svg>
+  {
+    wordmark && (
+      <span class="wordmark logo__wordmark" style={`font-size: ${wordmarkSize}px; color: ${inkColor}`}>
+        lambda<i class="wordmark__us" aria-hidden="true" />software
+      </span>
+    )
+  }
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.42em;
+  }
+  .logo__mark {
+    display: block;
+    flex: none;
+  }
+</style>

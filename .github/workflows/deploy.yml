@@ -1,0 +1,45 @@
+name: Deploy to KonsoleH (lambdasoftware.be)
+
+# One-time setup: repo Settings -> Secrets and variables -> Actions.
+#   Secrets:   SFTP_USERNAME, SFTP_PASSWORD
+#   Variables: SFTP_HOST, SFTP_PORT, SFTP_REMOTE_PATH
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two deploys at once; let an in-flight deploy finish.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Astro
+        run: npm run build
+
+      - name: Deploy dist/ over SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
+        with:
+          server: ${{ vars.SFTP_HOST }}
+          port: ${{ vars.SFTP_PORT }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          local_path: './dist/*'
+          remote_path: ${{ vars.SFTP_REMOTE_PATH }}
+          sftp_only: true

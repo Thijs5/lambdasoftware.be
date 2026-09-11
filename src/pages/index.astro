@@ -1,0 +1,301 @@
+---
+import Base from '../layouts/Base.astro';
+import Logo from '../components/Logo.astro';
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+const mailto = `mailto:${site.email}`;
+
+const stackText = site.stack.rows
+  .map((r) => `${r.label.padEnd(17)}${r.items.join(' · ')}`)
+  .join('\n');
+---
+
+<Base>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="bar">
+    <div class="wrap bar-inner">
+      <a class="bar-logo" href="/" aria-label={`${site.name}, home`}>
+        <Logo size={26} wordmark accent />
+      </a>
+      <nav class="bar-nav">
+        <a href="#services">What I do</a>
+        <a href="#stack">Stack</a>
+        <a class="btn btn--sm btn--accent" href="#contact">Get in touch</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="wrap">
+        <p class="eyebrow">{site.hero.eyebrow}</p>
+        <h1>{site.hero.title}</h1>
+        <p class="lede">{site.hero.body}</p>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="band" id="services" aria-labelledby="services-title">
+      <div class="wrap">
+        <h2 id="services-title">{site.services.heading}</h2>
+        <p class="section-lede">{site.services.lede}</p>
+        <ul class="grid" role="list">
+          {
+            site.services.items.map((s, i) => (
+              <li>
+                <span class="idx">{String(i + 1).padStart(2, '0')}</span>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Tech stack -->
+    <section class="stack" id="stack" aria-labelledby="stack-title">
+      <div class="wrap">
+        <h2 id="stack-title">{site.stack.heading}</h2>
+        <p class="section-lede">{site.stack.lede}</p>
+        <div class="term" role="img" aria-label={`Stack: ${site.stack.rows.map((r) => `${r.label}: ${r.items.join(', ')}`).join('; ')}`}>
+          <div class="term-chrome" aria-hidden="true"><span></span><span></span><span class="dot-accent"></span></div>
+          <pre class="term-body" aria-hidden="true"><span class="c-punct">$</span> lambda --stack
+
+{stackText}</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact" aria-labelledby="contact-title">
+      <div class="wrap">
+        <div class="contact-inner">
+          <h2 id="contact-title">{site.contact.heading}</h2>
+          <p class="section-lede">{site.contact.body}</p>
+          <dl class="direct">
+            <dt>Email</dt>
+            <dd><a href={mailto}>{site.email}</a></dd>
+            <dt>Based in</dt>
+            <dd>{site.contact.location}</dd>
+            <dt>LinkedIn</dt>
+            <dd><a href={site.contact.linkedin} target="_blank" rel="noopener">be.linkedin.com/in/thijs-dickmans</a></dd>
+          </dl>
+          <a class="btn btn--accent contact-btn" href={mailto}>{site.contact.cta}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-inner">
+      <Logo size={26} wordmark variant="onDark" accent class="foot-logo" />
+      <p class="foot-meta">&copy; {year} Lambda Software · <span class="mono">{site.vatNote}</span></p>
+    </div>
+  </footer>
+</Base>
+
+<style>
+  /* Header */
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bar-bg);
+    backdrop-filter: blur(12px);
+  }
+  .bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding-block: var(--space-6);
+  }
+  .bar-logo {
+    text-decoration: none;
+  }
+  .bar-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+  .bar-nav > a:not(.btn) {
+    font: 500 15px/1 var(--sans);
+    color: var(--text-body);
+    text-decoration: none;
+  }
+  .bar-nav > a:not(.btn):hover {
+    color: var(--ink);
+  }
+  @media (max-width: 34rem) {
+    .bar-nav > a:not(.btn) {
+      display: none;
+    }
+  }
+
+  /* Hero */
+  .hero {
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+  .hero h1 {
+    font: 800 clamp(34px, 4.4vw, 56px) / 1.08 var(--sans);
+    max-width: 20ch;
+    margin: 18px 0 20px;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: 18px;
+    max-width: 54ch;
+  }
+
+  /* Section heading */
+  h2 {
+    font: 700 clamp(26px, 3vw, 34px) / 1.2 var(--sans);
+  }
+  .section-lede {
+    margin-top: var(--space-3);
+    max-width: 56ch;
+    color: var(--text-body);
+  }
+
+  /* Services */
+  .band {
+    padding-block: var(--space-24);
+    border-top: 1px solid var(--border);
+    background: var(--bg-band);
+  }
+  .grid {
+    list-style: none;
+    margin: var(--space-12) 0 0;
+    padding: 0;
+    display: grid;
+    /* min width tuned so 6 items resolve to 3+3 columns, not an awkward 4+2 */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .grid li {
+    background: var(--card);
+    padding: 26px 24px 28px;
+  }
+  .idx {
+    display: block;
+    font: 500 12px/1 var(--mono);
+    letter-spacing: 0.04em;
+    color: var(--accent-text);
+  }
+  .grid h3 {
+    font: 700 17px/1.3 var(--sans);
+    margin: 14px 0 8px;
+  }
+  .grid p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* Tech stack */
+  .stack {
+    padding-block: var(--space-24);
+    border-top: 1px solid var(--border);
+  }
+  .term {
+    margin-top: var(--space-8);
+    max-width: 640px;
+    background: #161b22;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--term-shadow);
+  }
+  .term-chrome {
+    display: flex;
+    gap: 7px;
+    padding: 14px 16px;
+    background: #0d1117;
+  }
+  .term-chrome span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #333;
+  }
+  .term-chrome .dot-accent {
+    background: var(--accent);
+  }
+  .term-body {
+    margin: 0;
+    padding: 22px clamp(16px, 2vw, 24px) 26px;
+    font: 400 clamp(12px, 1.15vw, 13.5px) / 1.9 var(--mono);
+    color: #e6edf3;
+    overflow-x: auto;
+  }
+  .term-body .c-punct {
+    color: #64748b;
+  }
+
+  /* Contact */
+  .contact {
+    padding-block: var(--space-24);
+    border-top: 1px solid var(--border);
+  }
+  .contact-inner {
+    max-width: 640px;
+  }
+  .direct {
+    margin: var(--space-8) 0 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px var(--space-6);
+    font-size: 15px;
+  }
+  .direct dt {
+    font: 600 11px/1.9 var(--sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .direct dd {
+    margin: 0;
+    color: var(--ink);
+  }
+  .contact-btn {
+    margin-top: var(--space-8);
+  }
+
+  /* Footer */
+  .foot {
+    background: #0a0a0a;
+    color: #94a3b8;
+    padding-block: var(--space-12);
+    border-top: 1px solid var(--border);
+  }
+  .foot-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+  .foot-meta {
+    font-size: 13.5px;
+  }
+  .foot-meta .mono {
+    font-size: 13px;
+  }
+
+  @media (max-width: 55rem) {
+    .band,
+    .stack {
+      padding-block: var(--space-16);
+    }
+    .contact {
+      padding-block: var(--space-16);
+    }
+  }
+</style>
