@@ -33,7 +33,7 @@
   --ink: #0a0a0a;
   --ink-hover: #232323;
   --text-body: #334155;
-  --text-muted: #64748b;
+  --text-muted: #475569; /* slate-600: 7.58:1 on white, meets WCAG AAA (was #64748b at 4.76:1, AA only) */
   --border: #e2e8f0;
   --border-input: #cbd5e1;
 

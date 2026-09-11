@@ -83,7 +83,11 @@ const stackText = site.stack.rows
             <dt>Based in</dt>
             <dd>{site.contact.location}</dd>
             <dt>LinkedIn</dt>
-            <dd><a href={site.contact.linkedin} target="_blank" rel="noopener noreferrer">{linkedinLabel}</a></dd>
+            <dd>
+              <a href={site.contact.linkedin} target="_blank" rel="noopener noreferrer">
+                {linkedinLabel}<span class="visually-hidden"> (opens in a new tab)</span>
+              </a>
+            </dd>
           </dl>
           <a class="btn btn--accent contact-btn" href={mailto}>{site.contact.cta}</a>
         </div>
