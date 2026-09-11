@@ -64,9 +64,9 @@ const stackText = site.stack.rows
         <p class="section-lede">{site.stack.lede}</p>
         <div class="term" role="img" aria-label={`Stack: ${site.stack.rows.map((r) => `${r.label}: ${r.items.join(', ')}`).join('; ')}`}>
           <div class="term-chrome" aria-hidden="true"><span></span><span></span><span class="dot-accent"></span></div>
-          <pre class="term-body" aria-hidden="true"><span class="c-punct">$</span> lambda --stack
+          <pre class="term-body" aria-hidden="true" id="term-body"><span class="c-punct">$</span> <span id="term-typed">lambda --stack
 
-{stackText}</pre>
+{stackText}</span></pre>
         </div>
       </div>
     </section>
@@ -243,6 +243,22 @@ const stackText = site.stack.rows
   .term-body .c-punct {
     color: #64748b;
   }
+  :global(.term-cursor) {
+    display: inline-block;
+    width: 2px;
+    /* Matched to the $ glyph's ink extent in JetBrains Mono, not the full
+       em box, so the bar lines up with the character next to it. */
+    height: 1.05em;
+    margin-left: 1px;
+    background: var(--accent);
+    vertical-align: -0.15em;
+    animation: term-blink 1s steps(1) infinite;
+  }
+  @keyframes term-blink {
+    50% {
+      opacity: 0;
+    }
+  }
 
   /* Contact */
   .contact {
@@ -304,3 +320,50 @@ const stackText = site.stack.rows
     }
   }
 </style>
+
+<script>
+  // Terminal type-in: plays once, the first time the stack block scrolls into
+  // view. Types the command, then reveals the (already-rendered) output.
+  // Skipped entirely for prefers-reduced-motion — the static text just shows.
+  const typed = document.getElementById('term-typed');
+  const term = document.getElementById('term-body');
+
+  if (typed && term && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const command = 'lambda --stack';
+    const full = typed.textContent ?? '';
+    const output = full.slice(command.length);
+
+    typed.textContent = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'term-cursor';
+    typed.after(cursor);
+
+    let i = 0;
+    const typeCommand = () => {
+      if (i < command.length) {
+        typed.textContent += command[i];
+        i++;
+        setTimeout(typeCommand, 40);
+      } else {
+        setTimeout(() => {
+          typed.textContent += output + '\n';
+          const prompt = document.createElement('span');
+          prompt.className = 'c-punct';
+          prompt.textContent = '$';
+          cursor.before(prompt, ' ');
+        }, 300);
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          typeCommand();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+    observer.observe(term);
+  }
+</script>
