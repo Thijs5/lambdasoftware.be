@@ -6,10 +6,6 @@ import { site } from '../data/site';
 const year = new Date().getFullYear();
 const mailto = `mailto:${site.email}`;
 const linkedinLabel = site.contact.linkedin.replace(/^https?:\/\//, '');
-
-const stackText = site.stack.rows
-  .map((r) => `${r.label.padEnd(17)}${r.items.join(' · ')}`)
-  .join('\n');
 ---
 
 <Base>
@@ -23,7 +19,12 @@ const stackText = site.stack.rows
       <nav class="bar-nav">
         <a href="#services">What I do</a>
         <a href="#stack">Stack</a>
-        <a class="btn btn--sm btn--accent" href="#contact">Get in touch</a>
+        <a class="btn btn--sm btn--accent" href="#contact">
+          <span class="btn-label">Get in touch</span>
+          <svg class="btn-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
       </nav>
     </div>
   </header>
@@ -64,10 +65,22 @@ const stackText = site.stack.rows
         <p class="section-lede">{site.stack.lede}</p>
         <div class="term" role="img" aria-label={`Stack: ${site.stack.rows.map((r) => `${r.label}: ${r.items.join(', ')}`).join('; ')}`}>
           <div class="term-chrome" aria-hidden="true"><span></span><span></span><span class="dot-accent"></span></div>
-          <pre class="term-body" aria-hidden="true" id="term-body"><span class="c-punct">$</span> <span id="term-typed">lambda --stack
-
-{stackText}</span>
-<span class="c-punct" id="term-prompt-2">$ </span></pre>
+          <div class="term-body" aria-hidden="true" id="term-body">
+            <pre class="term-cmd"><span class="c-punct">$</span> <span id="term-typed">lambda --stack</span></pre>
+            <div class="term-rows" id="term-rows">
+              {
+                site.stack.rows.map((r) => (
+                  <div class="term-row">
+                    <span class="row-label">{r.label}</span>
+                    <span class="row-items">
+                      {r.items.map((item) => <span class="row-item">{item}</span>)}
+                    </span>
+                  </div>
+                ))
+              }
+            </div>
+            <pre class="term-prompt2" id="term-prompt-2"><span class="c-punct">$ </span></pre>
+          </div>
         </div>
       </div>
     </section>
@@ -90,7 +103,12 @@ const stackText = site.stack.rows
               </a>
             </dd>
           </dl>
-          <a class="btn btn--accent contact-btn" href={mailto}>{site.contact.cta}</a>
+          <a class="btn btn--accent contact-btn" href={mailto}>
+            {site.contact.cta}
+            <svg class="btn-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>
@@ -136,9 +154,56 @@ const stackText = site.stack.rows
   .bar-nav > a:not(.btn):hover {
     color: var(--ink);
   }
+  .bar-nav > a.btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Btn icon: nudges right on hover, echoing the .btn's own transition. */
+  :global(.btn-icon) {
+    flex: none;
+    transition: transform 0.14s cubic-bezier(0.2, 0.6, 0.25, 1);
+  }
+  :global(.btn:hover .btn-icon) {
+    transform: translateX(2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.btn-icon) {
+      transition: none;
+    }
+  }
   @media (max-width: 34rem) {
     .bar-nav > a:not(.btn) {
       display: none;
+    }
+    .bar-inner {
+      gap: var(--space-3);
+    }
+  }
+  /* Below this, the full label no longer fits next to the wordmark on one
+     line — collapse the CTA to its icon instead of wrapping the header.
+     The label stays in the DOM (visually hidden, not display:none) so the
+     accessible name is unchanged. */
+  @media (max-width: 25rem) {
+    .bar-nav > a.btn {
+      width: 38px;
+      padding: 0;
+    }
+    .bar-nav .btn-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  }
+  @media (max-width: 19rem) {
+    .bar-inner {
+      gap: var(--space-1);
     }
   }
 
@@ -235,14 +300,57 @@ const stackText = site.stack.rows
     background: var(--accent);
   }
   .term-body {
-    margin: 0;
     padding: 22px clamp(16px, 2vw, 24px) 26px;
     font: 400 clamp(12px, 1.15vw, 13.5px) / 1.9 var(--mono);
     color: #e6edf3;
-    overflow-x: auto;
+  }
+  .term-cmd,
+  .term-prompt2 {
+    margin: 0;
+    font: inherit;
+    color: inherit;
   }
   .term-body .c-punct {
     color: #64748b;
+  }
+  .term-rows {
+    /* Matches the blank line (line-height 1.9) that used to sit between the
+       command and its output when this was one plain-text block. */
+    margin: 1.9em 0 0;
+  }
+  .term-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .row-label {
+    flex: 0 0 17ch;
+  }
+  .row-item:not(:last-child)::after {
+    content: " · ";
+  }
+  /* Fixed-width columns stop working once the longest row (label + every
+     item on one line) no longer fits — reflow to one item per line instead
+     of clipping or forcing a horizontal scroll. */
+  @media (max-width: 30rem) {
+    .term-row {
+      display: block;
+    }
+    .term-row + .term-row {
+      margin-top: 0.6em;
+    }
+    .row-label {
+      display: block;
+    }
+    .row-items {
+      display: block;
+    }
+    .row-item {
+      display: block;
+      padding-left: 1.5em;
+    }
+    .row-item:not(:last-child)::after {
+      content: none;
+    }
   }
   :global(.term-cursor) {
     display: inline-block;
@@ -328,24 +436,24 @@ const stackText = site.stack.rows
   // Skipped entirely for prefers-reduced-motion — the static text just shows.
   const typed = document.getElementById('term-typed');
   const term = document.getElementById('term-body');
+  const rows = document.getElementById('term-rows');
   const prompt2 = document.getElementById('term-prompt-2');
 
-  if (typed && term && prompt2 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const command = 'lambda --stack';
-    const full = typed.textContent ?? '';
-    const output = full.slice(command.length);
+  if (typed && term && rows && prompt2 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const command = typed.textContent ?? '';
 
     const setup = () => {
-      // The trailing "$" prompt is already in the markup, so at this point
-      // (before anything is touched) the terminal is already at its final
-      // height. Lock that in, then hide the prompt until typing reaches it —
-      // the terminal never resizes during the animation.
+      // The rows + trailing "$" prompt are already in the markup, so at this
+      // point (before anything is touched) the terminal is already at its
+      // final height. Lock that in, then hide them until typing reaches
+      // that point — the terminal never resizes during the animation.
       //
       // Measured only after document.fonts.ready: JetBrains Mono loads via
       // font-display: swap, so an earlier measurement would lock in the
       // fallback font's (shorter) metrics and the box would still grow once
       // the real font swaps in.
       term.style.minHeight = `${term.getBoundingClientRect().height}px`;
+      rows.style.visibility = 'hidden';
       prompt2.style.visibility = 'hidden';
 
       typed.textContent = '';
@@ -361,9 +469,9 @@ const stackText = site.stack.rows
           setTimeout(typeCommand, 40);
         } else {
           setTimeout(() => {
-            typed.textContent += output;
+            rows.style.visibility = 'visible';
             prompt2.style.visibility = 'visible';
-            prompt2.after(cursor);
+            prompt2.appendChild(cursor);
           }, 300);
         }
       };
