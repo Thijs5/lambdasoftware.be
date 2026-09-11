@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // ── Deployment target ────────────────────────────────────────────────────────
 // KonsoleH-managed webspace at the domain root, served over SFTP by
@@ -14,4 +15,5 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   compressHTML: true,
+  integrations: [sitemap()],
 });

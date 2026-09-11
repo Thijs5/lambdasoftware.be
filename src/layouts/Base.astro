@@ -9,6 +9,42 @@ interface Props {
 const { title = site.meta.title, description = site.meta.description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(site.meta.ogImage, Astro.site);
+
+// JSON-LD: the freelance business as a ProfessionalService, with Thijs as
+// founder. Built from the same site data as the page copy, so it can't drift.
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'Lambda Software',
+  url: canonical.origin,
+  image: ogImage.toString(),
+  description: site.meta.description,
+  email: site.email,
+  founder: {
+    '@type': 'Person',
+    name: site.owner,
+    email: site.email,
+    jobTitle: 'Freelance fullstack software developer',
+    sameAs: [site.contact.linkedin],
+  },
+  areaServed: {
+    '@type': 'Country',
+    name: 'Belgium',
+  },
+  address: {
+    '@type': 'PostalAddress',
+    addressRegion: 'Leuven/Tienen',
+    addressCountry: 'BE',
+  },
+  makesOffer: site.services.items.map((s) => ({
+    '@type': 'Offer',
+    itemOffered: {
+      '@type': 'Service',
+      name: s.title,
+      description: s.body,
+    },
+  })),
+};
 ---
 
 <!doctype html>
@@ -21,23 +57,51 @@ const ogImage = new URL(site.meta.ogImage, Astro.site);
     <link rel="canonical" href={canonical} />
 
     <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon-32.png`} type="image/png" sizes="32x32" />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon-48.png`} type="image/png" sizes="48x48" />
+    <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}apple-touch-icon.png`} />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
 
-    <!-- Fonts: Lambda Software Design System pairing (Manrope + JetBrains Mono) -->
+    <!-- Fonts: Lambda Software Design System pairing (Manrope + JetBrains Mono).
+         Loaded non-blocking (print-media swap trick) so first paint doesn't wait
+         on Google Fonts; noscript covers the no-JS case. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name} — ${site.owner}`} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={`${site.name} — ${site.owner}`} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}
+      is:inline
+    />
   </head>
   <body>
     <slot />

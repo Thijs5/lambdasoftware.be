@@ -5,6 +5,7 @@ import { site } from '../data/site';
 
 const year = new Date().getFullYear();
 const mailto = `mailto:${site.email}`;
+const linkedinLabel = site.contact.linkedin.replace(/^https?:\/\//, '');
 
 const stackText = site.stack.rows
   .map((r) => `${r.label.padEnd(17)}${r.items.join(' · ')}`)
@@ -82,7 +83,7 @@ const stackText = site.stack.rows
             <dt>Based in</dt>
             <dd>{site.contact.location}</dd>
             <dt>LinkedIn</dt>
-            <dd><a href={site.contact.linkedin} target="_blank" rel="noopener">be.linkedin.com/in/thijs-dickmans</a></dd>
+            <dd><a href={site.contact.linkedin} target="_blank" rel="noopener noreferrer">{linkedinLabel}</a></dd>
           </dl>
           <a class="btn btn--accent contact-btn" href={mailto}>{site.contact.cta}</a>
         </div>
@@ -92,7 +93,7 @@ const stackText = site.stack.rows
 
   <footer class="foot">
     <div class="wrap foot-inner">
-      <Logo size={26} wordmark variant="onDark" accent class="foot-logo" />
+      <Logo size={26} wordmark variant="onDark" accent />
       <p class="foot-meta">&copy; {year} Lambda Software · <span class="mono">{site.vatNote}</span></p>
     </div>
   </footer>

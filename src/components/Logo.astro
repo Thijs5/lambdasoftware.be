@@ -58,8 +58,9 @@ const wordmarkSize = +(size * (21 / 26)).toFixed(2);
     height={height}
     viewBox="0 0 99.86 100"
     fill-rule="evenodd"
-    role="img"
-    aria-label={wordmark ? 'lambda_software' : 'lambda_software logo'}
+    role={wordmark ? undefined : 'img'}
+    aria-label={wordmark ? undefined : 'lambda_software logo'}
+    aria-hidden={wordmark ? 'true' : undefined}
     xmlns="http://www.w3.org/2000/svg"
   >
     <defs>

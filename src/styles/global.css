@@ -63,25 +63,6 @@
   --radius-lg: 12px;
 }
 
-:root[data-theme="dark"] {
-  --bg: #0a0a0a;
-  --bg-band: #131313;
-  --card: #161616;
-  --ink: #ffffff;
-  --ink-hover: #f1f5f9;
-  --text-body: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border: #262626;
-  --border-input: #333333;
-  --btn-bg: #ffffff;
-  --btn-fg: #0a0a0a;
-  --btn-bg-hover: #e2e8f0;
-  --accent-100: rgba(124, 58, 237, 0.22);
-  --accent-text: #a78bfa;
-  --bar-bg: rgba(10, 10, 10, 0.86);
-  --term-shadow: 0 0 0 1px #262626;
-}
-
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0a0a0a;
