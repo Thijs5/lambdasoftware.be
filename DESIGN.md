@@ -1,5 +1,13 @@
 # Design notes
 
+## Homepage introduction
+
+The hero leads with the work offered: web applications built around a client's
+business. The supporting text covers new applications and existing systems,
+names the core stack, and explains how Thijs helps development teams focus on
+business priorities. Keep this introduction plain and specific, without slogans
+or deployment jargon.
+
 > **2026-09-11 update:** the site now tracks the "Lambda Software Design
 > System" (tokens, the crossed-strip mark, Manrope +
 > JetBrains Mono, and the marketing-site voice guide). The brand-sheet rating

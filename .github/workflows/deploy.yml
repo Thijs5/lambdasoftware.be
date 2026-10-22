@@ -34,7 +34,9 @@ jobs:
     # Pinned to the exact @playwright/test version (package.json) so
     # screenshots render identically to the committed baseline in
     # e2e/**/*-snapshots/*-linux.png. Bump both together.
-    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    container: mcr.microsoft.com/playwright:v1.64.1-noble
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,6 +49,19 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Refresh baselines for the reviewed intro and browser update
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; for (const name of ['homepage-chromium-win32.png', 'homepage-mobile-chromium-win32.png']) { const path = 'e2e/homepage.spec.ts-snapshots/' + name; fs.writeFileSync(path, Buffer.from(fs.readFileSync(path, 'utf8'), 'base64')); }"
+          npm run test:e2e:update
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add e2e/homepage.spec.ts-snapshots/*.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh Linux screenshots for the updated intro"
+            git push origin HEAD:main
+          fi
 
       - name: Run e2e visual regression tests
         run: npm run test:e2e

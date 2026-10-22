@@ -20,9 +20,9 @@ export const site = {
 
   hero: {
     eyebrow: 'Freelance software developer · Belgium',
-    title: 'Fullstack software, from schema to deploy.',
+    title: 'Web applications, built around your business.',
     body:
-      "I'm Thijs Dickmans. Lambda Software is the name I work under. Mainly .NET on the backend, TypeScript on the front, SQL Server underneath.",
+      'I build custom web applications and help teams improve existing systems, working with .NET, TypeScript and SQL Server. I also help development teams stay focused on what matters to your business.',
   },
 
   services: {

@@ -2,7 +2,7 @@
 
 ![Deploy](https://github.com/Thijs5/lambdasoftware.be/actions/workflows/deploy.yml/badge.svg)
 ![Astro](https://img.shields.io/badge/astro-7-BC52EE?logo=astro&logoColor=white)
-![TypeScript](https://img.shields.io/badge/typescript-5-3178C6?logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-6-3178C6?logo=typescript&logoColor=white)
 ![Node](https://img.shields.io/badge/node-24-339933?logo=nodedotjs&logoColor=white)
 ![Tested with Playwright](https://img.shields.io/badge/tested%20with-playwright-2EAD33?logo=playwright&logoColor=white)
 ![Zero client JS](https://img.shields.io/badge/client--side%20JS-0KB-blue)
@@ -51,6 +51,12 @@ robots.txt, llms.txt) respond as expected. It runs on every push as a required s
 before deploy, so a broken build or a visual regression blocks the release. See the
 pinned Playwright version note in `.github/workflows/deploy.yml` before bumping
 `@playwright/test`.
+
+The dependency update uses Astro 7.4.1, Astro Check 0.9.11, Playwright 1.64.1
+and TypeScript 6.0.3. TypeScript stays on the newest compatible major supported
+by Astro Check. The Playwright CI image must match the installed test version;
+refresh and review desktop and mobile screenshots after intentional copy or
+browser changes, then run the suite against those baselines before deploying.
 
 ## Deploy (KonsoleH + GitHub Pages, lambdasoftware.be)
 
